@@ -3,7 +3,7 @@ This GitHub repository contains the scripts for the IEEE ICASSP 2024 paper submi
 
 Author:	Martin Voigt Vejling
 
-E-Mails:	mvv@{math,es}.aau.dk, martin.vejling@gmail.com
+E-Mails:	mvv@math.aau.dk, mvv@es.aau.dk, martin.vejling@gmail.com
 
 In this work a doubly inhomogeneous generalized shot noise Cox process model is proposed to model the measurement process in multi-sensor multi-scan multiple extended object radar sensing scenarios. An estimation procedure based on jump Markov chain Monte Carlo is provided to do target state estimation. For comparison, a spatial proximity baseline is provided in the DBSCAN algorithm with hyperparameters optimized by the posterior of the aforementioned model. Moreover, a theoretically optimal oracle method is also given for comparison.
 
