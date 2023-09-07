@@ -11,13 +11,13 @@ Track changes:
            The filter iterates the belief through time as additional scans
            are made, thereby collecting measurements and
            performing processing. (25/08/2023)
+    v1.1 - Adapted to v1.4 MCMC.py, v1.2 oracle.py, and v1.0 clustering.py.
+           Changed inheritance to Fisher_Information instead
+           of Measurement_Model. Update to sensor_resolution taking
+           multiple channel uses into account. CRLB exception handling.
+           Zero measurements exception handling. (07/09/2023)
 """
 
-
-import sys
-import os
-if os.path.abspath("..")+"/Modules" not in sys.path:
-    sys.path.append(os.path.abspath("..")+"/Modules")
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -512,124 +512,6 @@ class main_filter(Fisher_Information):
 
         return rho_interp, Sigma_interp
 
-    # def get_measurements(self, pars, Phi, s_U, f_tilde, omega_tilde, W_mat):
-    #     """
-    #     Parameters
-    #     ----------
-    #     pars : dict
-    #         Dictionary of channel parameters.
-    #     Phi : ndarray, size=(L, 3)
-    #         Target positions.
-    #     s_U : ndarray, size=(K, 1, 5)
-    #         UE states.
-    #     f_tilde : ndarray, size=(T/2, K, 1, N_U)
-    #         Precoder.
-    #     omega_tilde : ndarray, size=(T/2, N_R)
-    #         RIS phase profile.
-    #     W_mat : ndarray, size=(K, 1, N_U, N_U)
-    #         Combiner.
-
-    #     Returns
-    #     -------
-    #     points : ndarray, size=(3, K, L_obs+N_clut, 3)
-    #         Measurement points. Undetected points are filled with NaNs.
-    #     detection_marks : ndarray, size=(3, K, L_obs+N_clut)
-    #         Detection probability marks. Undetected points are filled with NaNs.
-    #     covariance_marks : ndarray, size=(3, K, L_obs+N_clut, 3, 3)
-    #         Covariance marks. Undetected points are filled with NaNs.
-    #     """
-    #     K, _, L = pars["alphal"].shape
-
-    #     aU_thetal = self.UPA_array_response_vector(pars["thetal"], self.N_U, self.d_U) # size=(K, E, L, N_U)
-    #     if "directional" or "orthogonal" in self.signal_types:
-    #         aR_phi0 = self.UPA_array_response_vector(pars["phi0"], self.N_R, self.d_R) # size=(K, E, N_R)
-    #         aR_phil = self.UPA_array_response_vector(pars["phil"], self.N_R, self.d_R) # size=(L, N_R)
-    #         aR_phi0_prod = omega_tilde[:, None, None, :]*aR_phi0[None, :, :, :]
-    #     gamma = -2*np.log(self.p_FA)
-
-    #     points = np.zeros((0, K, 1, L, 3))
-    #     detection_probability = np.zeros((0, K, 1, L))
-    #     location_covariance = np.zeros((0, K, 1, L, 3, 3))
-
-    #     # Compute Fisher information and simulate detections
-    #     # OBS! Optimize to only compute FIM for detected points
-    #     for signal_type in self.signal_types:
-    #         if signal_type == "nonRIS":
-    #             FIM_nonRIS = self.Fisher_information_matrix_nonRIS_simplified(pars, f_tilde)
-    #             CRLB = self.FIM_processing(FIM_nonRIS, pars, Phi, s_U[:, :, :3], s_U[:, :, 3:]) # size=(K, 1, L, 3, 3)
-
-    #             lambda_N = self.lambda_N(pars, f_tilde, aU_thetal)
-    #             p_D = np.zeros((K, 1, L))
-    #             for k in range(K):
-    #                 for l in range(L):
-    #                     p_D[k, 0, l] = 1 - ncx2.cdf(gamma, 2, lambda_N[k, 0, l])
-    #             detection = np.random.binomial(np.ones((K, 1, L)).astype(np.int32), p_D).astype(np.bool_)
-    #         if signal_type == "directional":
-    #             FIM_directional = self.Fisher_information_matrix_directional_simplified(pars, omega_tilde, W_mat)
-    #             CRLB = self.FIM_processing(FIM_directional, pars, Phi, s_U[:, :, :3], s_U[:, :, 3:])
-
-    #             nu_tilde_D = np.einsum("li,tkei->tkel", aR_phil, aR_phi0_prod[:self.T1, :, :, :]) # size=(T, K, E, L)
-    #             lambda_D = self.lambda_D(pars, W_mat, aR_phi0, aR_phil, aU_thetal, nu_tilde_D)
-    #             p_D = np.zeros((K, 1, L))
-    #             for k in range(K):
-    #                 for l in range(L):
-    #                     p_D[k, 0, l] = 1 - ncx2.cdf(gamma, 2, lambda_D[k, 0, l])
-    #             detection = np.random.binomial(np.ones((K, 1, L)).astype(np.int32), p_D).astype(np.bool_)
-    #         if signal_type == "orthogonal":
-    #             FIM_orthogonal = self.Fisher_information_matrix_orthogonal_simplified(pars, f_tilde, omega_tilde, W_mat)
-    #             CRLB = self.FIM_processing(FIM_orthogonal, pars, Phi, s_U[:, :, :3], s_U[:, :, 3:])
-
-    #             nu_tilde_O = np.einsum("li,tkei->tkel", aR_phil, aR_phi0_prod[self.T1:, :, :, :]) # size=(T, K, E, L)
-    #             lambda_O = self.lambda_O(pars, f_tilde[self.T1:, :, :, :], nu_tilde_O, aU_thetal)
-    #             p_D = np.zeros((K, 1, L))
-    #             for k in range(K):
-    #                 for l in range(L):
-    #                     p_D[k, 0, l] = 1 - ncx2.cdf(gamma, 2, lambda_O[k, 0, l])
-    #             detection = np.random.binomial(np.ones((K, 1, L)).astype(np.int32), p_D).astype(np.bool_)
-
-    #         # Simulate points
-    #         all_points, all_covariance, all_detection \
-    #             = self.simulate_one_type_points(Phi, CRLB, p_D, detection)
-    #         points = np.concatenate((points, np.expand_dims(all_points, axis=0)), axis=0)
-    #         detection_probability = np.concatenate((detection_probability, np.expand_dims(all_detection, axis=0)), axis=0)
-    #         location_covariance = np.concatenate((location_covariance, np.expand_dims(all_covariance, axis=0)), axis=0)
-
-    #     # Simulate clutter
-    #     clutter = [[PoissonPointProcess(self.window, self.lambda_c).points for k in range(K)] for q in range(self.Q)]
-    #     M_clutter = [[cl.shape[0] for cl in clut] for clut in clutter]
-    #     max_clutter = max([max(M_clut) for M_clut in M_clutter])
-    #     clutter_points = np.zeros((self.Q, K, 1, max_clutter, 3))
-    #     clutter_points[:] = None
-    #     for q in range(self.Q):
-    #         for k in range(K):
-    #             clutter_points[q, k, 0, :M_clutter[q][k], :] = clutter[q][k]
-    #     points = np.concatenate((points, clutter_points), axis=3)
-
-    #     # Compute marks
-    #     if self.oracle_hparams["true_loc_marks"] is False:
-    #         detection_marks, covariance_marks = self.compute_marks(points, s_U, f_tilde, omega_tilde, W_mat, self.signal_types, self.p_FA)
-    #     elif self.oracle_hparams["true_loc_marks"] is True:
-    #         Q, K, _, L, _ = points.shape
-    #         detection_marks = np.zeros((Q, K, 1, L))
-    #         covariance_marks = np.zeros((Q, K, 1, L, 3, 3))
-    #         detection_marks[:, :, :, :self.L_true] = detection_probability
-    #         covariance_marks[:, :, :, :self.L_true, :, :] = location_covariance
-    #         detection_marks[:, :, :, self.L_true:], covariance_marks[:, :, :, self.L_true:, :, :]\
-    #             = self.compute_marks(points[:, :, :, self.L_true:, :], s_U, f_tilde, omega_tilde, W_mat, self.signal_types, self.p_FA)
-    #     elif self.oracle_hparams["true_loc_marks"] == -1:
-    #         Q, K, _, L, _ = points.shape
-    #         detection_marks = np.zeros((Q, K, 1, L))
-    #         detection_marks[:] = None
-    #         covariance_marks = np.zeros((Q, K, 1, L, 3, 3))
-    #         covariance_marks[:] = None
-    #         for q in range(self.Q):
-    #             for k in range(K):
-    #                 for l in range(self.L_true):
-    #                     if not np.any(np.isnan(location_covariance[q, k, 0, l, :, :])):
-    #                         detection_marks[q, k, 0, l] = 1
-    #                         covariance_marks[q, k, 0, l, :, :] = np.eye(3)
-    #     return points[:, :, 0, :, :], detection_marks[:, :, 0, :], covariance_marks[:, :, 0, :, :, :]
-
     def compute_cramer_rao(self, p, s_U_k, f_tilde, omega_tilde, W_mat, signal_type):
         """
         Parameters
@@ -873,59 +755,6 @@ class main_filter(Fisher_Information):
                             covariance_marks[q, k, 0, l, m, :, :] = np.eye(3)                           
         return points[:, :, 0, :, :, :], covariance_marks[:, :, 0, :, :, :, :]
 
-    # def prepare_oracle_data(self, points_tot, covariance_tot, Phi_E):
-    #     """
-    #     Prepare the data for the oracle algorithm.
-
-    #     Parameters
-    #     ----------
-    #     points_tot : list, len=(ti+1)
-    #         List of length ti+1 of ndarrays of size=(Q, K, L_true, M_kl, d)
-    #         of the observed measurements.
-    #     covariance_tot : list, len=(ti+1)
-    #         List of length ti+1 of ndarrays of size=(Q, K, L_true, M_kl, d, d)
-    #         of the covariance marks for the measurements.
-    #     Phi_E : ndarray, size=(L_true, extent_dim)
-    #         The object extent process.
-
-    #     Returns
-    #     -------
-    #     points_oracle_in : ndarray, size=((ti+1)*Q*K, L_true, M_max, d)
-    #         Rearrangement of the points in points_tot filling with nans to
-    #         fit sizes.
-    #     covariance_oracle_in : ndarray, size=((ti+1)*Q*K, L_true, M_max, d, d)
-    #         Rearrangement of the covariances in covariance_tot and added
-    #         object extent covariance. Filled with nans to fit sizes.
-    #     detected_mask : ndarray, size=(L_true,), dtype=bool
-    #         If the l-th entry is True, then one or more measurement were
-    #         made for this target.
-    #     """
-    #     ti, L_true = len(points_tot)-1, Phi_E.shape[0]
-    #     M_counts = [points_tot[i].shape[3] for i in range(ti+1)]
-    #     M_max = max(M_counts)
-    #     detected_mask = np.zeros(L_true, dtype=bool)
-    #     points_oracle_in = np.zeros(((ti+1)*self.Q*self.K, L_true, M_max, 3))
-    #     points_oracle_in[:] = None
-    #     covariance_oracle_in = np.zeros(((ti+1)*self.Q*self.K, L_true, M_max, 3, 3))
-    #     covariance_oracle_in[:] = None
-    #     for i in range(ti+1):
-    #         for q in range(self.Q):
-    #             for k in range(self.K):
-    #                 for l in range(L_true):
-    #                     points_oracle_in[i*self.Q*self.K+q*self.K+k, l, :M_counts[i], :] = points_tot[i][q, k, l, :, :]
-    #                     if np.nansum(points_oracle_in[:, l, :, :].flatten()) > 0:
-    #                         detected_mask[l] = True
-    #                     if self.MCMC_hparams["extent_prior"] == "1d_uniform":
-    #                         covariance_oracle_in[i*self.Q*self.K+q*self.K+k, l, :M_counts[i], :, :] \
-    #                             = covariance_tot[i][q, k, l, :, :, :] + Phi_E[l]**2*np.eye(self.d)[None, :, :] * np.ones(M_counts[i])[:, None, None]
-    #                     elif self.MCMC_hparams["extent_prior"] == "inverse-wishart":
-    #                         E_mat = np.zeros((self.d, self.d))
-    #                         E_mat[self.tril_idx] = Phi_E[l]
-    #                         Sigma_E = E_mat @ E_mat.T
-    #                         covariance_oracle_in[i*self.Q*self.K+q*self.K+k, l, :M_counts[i], :, :] \
-    #                             = covariance_tot[i][q, k, l, :, :, :] + Sigma_E[None, :, :] * np.ones(M_counts[i])[:, None, None]
-    #     return points_oracle_in, covariance_oracle_in, detected_mask
-
     def plot_and_print(self, log_posterior_list, acceptance_history, Psi_tot, points_tot,
                        Phi, Phi_DBSCAN, Phi_oracle, Phi_est, Phi_est_v2, ti, 
                        Tilde_Phi, Tilde_Phi_est, Tilde_Phi_est_v2, Tilde_Phi_DBSCAN, Tilde_Phi_oracle):
@@ -978,23 +807,6 @@ class main_filter(Fisher_Information):
             plt.legend()
             plt.show()
 
-            # with open(f"Results/scatter_plot/Psi_data_t{ti+1}.txt", "w") as file:
-            #     for Psi_k in Psi_tot:
-            #         for p in Psi_k:
-            #             file.write(f"{p[0]}  {p[1]}  {p[2]}\n")
-            # with open(f"Results/scatter_plot/Phi_data_t{ti+1}.txt", "w") as file:
-            #     for c in Phi:
-            #         file.write(f"{c[0]}  {c[1]}  {c[2]}\n")
-            # with open(f"Results/scatter_plot/Phi_MCMC_data_t{ti+1}.txt", "w") as file:
-            #     for c_hat in Phi_est:
-            #         file.write(f"{c_hat[0]}  {c_hat[1]}  {c_hat[2]}\n")
-            # with open(f"Results/scatter_plot/Phi_oracle_data_t{ti+1}.txt", "w") as file:
-            #     for c_hat in Phi_oracle:
-            #         file.write(f"{c_hat[0]}  {c_hat[1]}  {c_hat[2]}\n")
-            # with open(f"Results/scatter_plot/Phi_DBSCAN_data_t{ti+1}.txt", "w") as file:
-            #     for c_hat in Phi_DBSCAN:
-            #         file.write(f"{c_hat[0]}  {c_hat[1]}  {c_hat[2]}\n")
-
         print("")
         print("True   Cardinality :", Phi.shape[0])
         print("DBSCAN Cardinality :", Phi_DBSCAN.shape[0])
@@ -1028,10 +840,6 @@ class main_filter(Fisher_Information):
         pred_Map["prior"] = None
         Phi, Phi_E = Tilde_Phi[:, :3], Tilde_Phi[:, 3:]
 
-        # for l in range(Phi.shape[0]):
-        #     E_mat = np.zeros((3, 3))
-        #     E_mat[self.tril_idx] = Phi_E[l]
-        #     print(np.linalg.det(E_mat))
 
         pU = self.simulate_UE_positions(self.K, self.E, self.heading, self.speed,
                                          self.epoch_time, None) # size=(K, E, 3)
@@ -1044,12 +852,6 @@ class main_filter(Fisher_Information):
         res_dict["Phi"] = Phi
         res_dict["Phi_E"] = Phi_E
 
-        # if self.extent is False:
-        #     points_tot = np.zeros((self.E, self.Q*self.K, L_true, 3))
-        #     points_tot[:] = None
-        #     covariance_tot = np.zeros((self.E, self.Q*self.K, L_true, 3, 3))
-        #     covariance_tot[:] = None
-        # else:
         points_tot = list()
         covariance_tot = list()
         Psi_da_tot = list()
@@ -1068,18 +870,6 @@ class main_filter(Fisher_Information):
             # Design precoder, combiner, RIS phase profile
             f_tilde, omega_tilde, W_mat = self.construct_RIS_phase_precoder_combiner(pars["theta0"], sU[:, :, :3], pred_Map)
 
-            # f_tilde = np.ones((self.T//2, self.K, 1, np.prod(self.N_U)))
-            # omega_tilde = self.RIS_random_codebook()
-            # W_mat = np.ones((self.K, 1, np.prod(self.N_U), np.prod(self.N_U)))
-
-            # Get measurements from measurement model
-            # if self.extent is False:
-            #     points, _, covariance_marks = self.get_measurements(pars, Phi, sU, f_tilde, omega_tilde, W_mat)
-
-            #     # Centralized measurement collection
-            #     points_tot[ti] = points[:, :, :L_true, :].reshape((-1, L_true, 3))
-            #     covariance_tot[ti] = covariance_marks[:, :, :L_true, :, :].reshape((-1, L_true, 3, 3))
-            # if self.extent is True:
             print("Simulate measurement process!")
             points, covariance_marks = self.get_extent_measurements(pars, Tilde_Phi, sU, f_tilde, omega_tilde, W_mat)
             points_tot.append(points)
@@ -1098,34 +888,6 @@ class main_filter(Fisher_Information):
             Psi = [np.concatenate((Psi_c[k], np.concatenate(Psi_da[k])), axis=0) for k in range(self.Q*self.K)]
             Psi_da_tot += Psi_da
             Psi_tot += Psi
-
-            # Filter recursion
-            # if self.sensing_alg == "oracle":
-            #     # Setup oracle input data
-            #     points_oracle_in = points_tot.reshape((-1, L_true, 1, 3))
-            #     covariance_oracle_in = covariance_tot.reshape((-1, L_true, 1, 3, 3))
-
-            #     # Run oracle sensing algorithm
-            #     oracle_alg = sensing_oracle(self.extent)
-            #     Phi_est, omega_est, alpha_est = oracle_alg(points_oracle_in, covariance_oracle_in, prepare_data=False)
-
-            #     print("Oracle  GOSPA :", GOSPA(Phi, Phi_est, c=10))
-            #     print("Oracle  OSPA  :", OSPA(Phi, Phi_est, c=10))
-            #     print("")
-
-            # elif self.sensing_alg == "MCMC":
-
-            # Run oracle for comparison
-            # if self.oracle_hparams["true_loc_marks"] is False:
-            #     assert self.extent_prior == "1d_uniform", "This is not adapted to inverse-wishart prior extent model yet!"
-            #     oracle_alg = sensing_oracle(self.extent, extent_bounds=[self.sigma_extent_min, self.sigma_extent_max])
-            #     Tilde_Phi_oracle, Sigma_oracle, rho_oracle = oracle_alg(Psi_da_tot, Sigma_interp_all, prepare_data=True)
-            #     Phi_oracle, Phi_E_oracle = Tilde_Phi_oracle[:, :3], Tilde_Phi_oracle[:, 3]
-            # else:
-            # oracle_alg = sensing_oracle()
-            # points_oracle_in, covariance_oracle_in, detected_mask = self.prepare_oracle_data(points_tot, covariance_tot, Phi_E)
-            # Tilde_Phi_oracle, Sigma_oracle, rho_oracle = oracle_alg(points_oracle_in, covariance_oracle_in, prepare_data=False)
-            # Phi_oracle, Phi_E_oracle = Tilde_Phi_oracle[:, :3], Phi_E[detected_mask]
 
             # Create detection probability and CRLB mapping interpolators
             if "DBSCAN" in self.sensing_alg or "MCMC" in self.sensing_alg:
@@ -1171,10 +933,11 @@ class main_filter(Fisher_Information):
                 DBSCAN_alg = sensing_DBSCAN(rho_interp_all, Sigma_interp_all, self.sensor_resolution_function,
                                             sU_all[:, :ti+1, :].reshape((self.K*(ti+1), 6), order="F"),
                                             self.window, self.p_FA, True, **self.DBSCAN_init_kwargs)
-                Tilde_Phi_DBSCAN, _, _, DBSCAN_pars_est = DBSCAN_alg(Psi_tot, self.DBSCAN_hparams["eps"],
-                                                                     np.array(self.DBSCAN_hparams["min_samples"])*(ti+1),
-                                                                     **self.DBSCAN_call_kwargs)
+                Tilde_Phi_DBSCAN, _, _, DBSCAN_pars_est, Tilde_Phi_DBSCAN_opt, Tilde_Phi_DBSCAN_extent_opt \
+                    = DBSCAN_alg(Psi_tot, self.DBSCAN_hparams["eps"], np.array(self.DBSCAN_hparams["min_samples"])*(ti+1), **self.DBSCAN_call_kwargs)
                 Phi_DBSCAN, Phi_E_DBSCAN = Tilde_Phi_DBSCAN[:, :d], Tilde_Phi_DBSCAN[:, d:]
+                Phi_DBSCAN_opt, Phi_E_DBSCAN_opt = Tilde_Phi_DBSCAN_opt[:, :d], Tilde_Phi_DBSCAN_opt[:, d:]
+                Phi_DBSCAN_extent_opt, Phi_E_DBSCAN_extent_opt = Tilde_Phi_DBSCAN_extent_opt[:, :d], Tilde_Phi_DBSCAN_extent_opt[:, d:]
 
             # Run MCMC sensing algorithm
             if "MCMC" in self.sensing_alg:
@@ -1240,6 +1003,8 @@ class main_filter(Fisher_Information):
                 res_dict[f"{ti}"]["Phi_est_v2"] = Phi_est_v2
             if "DBSCAN" in self.sensing_alg:
                 res_dict[f"{ti}"]["Phi_DBSCAN"] = Phi_DBSCAN
+                res_dict[f"{ti}"]["Phi_DBSCAN_opt"] = Phi_DBSCAN_opt
+                res_dict[f"{ti}"]["Phi_DBSCAN_extent_opt"] = Phi_DBSCAN_extent_opt
             if "oracle" in self.sensing_alg:
                 res_dict[f"{ti}"]["Phi_oracle"] = Phi_oracle
             if self.extent is True:
@@ -1248,6 +1013,8 @@ class main_filter(Fisher_Information):
                     res_dict[f"{ti}"]["Phi_E_est_v2"] = Extent_est_v2
                 if "DBSCAN" in self.sensing_alg:
                     res_dict[f"{ti}"]["Phi_E_DBSCAN"] = Phi_E_DBSCAN
+                    res_dict[f"{ti}"]["Phi_E_DBSCAN_opt"] = Phi_E_DBSCAN_opt
+                    res_dict[f"{ti}"]["Phi_E_DBSCAN_extent_opt"] = Phi_E_DBSCAN_extent_opt
                 if "oracle" in self.sensing_alg:
                     res_dict[f"{ti}"]["Phi_E_oracle"] = Phi_E_oracle
 
@@ -1257,6 +1024,8 @@ class main_filter(Fisher_Information):
             if "MCMC" in self.sensing_alg:
                 res_dict[f"{ti}"]["log_posterior"] = log_posterior_list
                 res_dict[f"{ti}"]["acceptance"] = acceptance_history
+                res_dict[f"{ti}"]["lambda"] = lambda_est
+                res_dict[f"{ti}"]["lambda_c"] = lambda_c_est
 
             ### Save observed data process ###
             # res_dict[f"{ti}"]["rho_interp"] = rho_interp

@@ -1,0 +1,36 @@
+# This is a TOML document.
+
+title = "Configuration file v2.0 for: RIS-Aided Radar Sensing: A Spatial Process Approach"
+
+[owner]
+name = "Martin Voigt Vejling"
+mail = "mvv@es.aau.dk"
+
+["track changes"]
+Python = """RIS-Aided Sensing v.1.0 - 14.12.2022:
+- Initial configuration file (v1.0 - 16.12.2022)
+- Specialized configuration files: allow for more adaptability in experiments (v.2.0 - 07.06.2023)"""
+
+["settings"]
+f_c = 3e10                      # float - Carrier frequency in Hz
+p_tx_hz_dbm = -40               # float - Transmit power in dBm per Hz
+p_noise_hz_dbm = -100           # float - Noise power in dBm
+N_U = [4, 4]                    # list (ints) - UE antennas
+N_R = [5, 5]                  # list (ints) - RIS elements
+p_R = [30.0, 45.0, 5.0]         # list (floats) - RIS position
+n_R = [0, -1, 0]                # list (ints) - RIS normal vector
+delta_f = 125e03               # float - Subcarrier spacing in Hz
+N = 800                        # int - Number of subcarriers
+c = 299792458                   # float - Speed of light in m/s
+T = 10                          # int - Number of time samples (40)
+T1 = 2                         # int - Number of time samples in first period
+E = 1                          # int - Number of time epochs
+window = [0, 50, 0, 20, 0, 10]  # list (ints) - Rectangular window boundaries
+                                # [xmin, xmax, ymin, ymax, zmin, zmax]
+K = 1                           # int - Number of spatial samples
+L = 0                           # int - Number of scattering points
+lambda_SP = 4e-04               # float - Intensity of scattering points; if not 0 overrides L.
+speed = 12.5                    # float - Speed of UEs (m/s)
+heading = "0"                   # str - Heading of UEs (rad)
+epoch_time = 2e-01              # float - Epoch sample time (s)
+use_directional_RIS = false     # If true, use directional RIS

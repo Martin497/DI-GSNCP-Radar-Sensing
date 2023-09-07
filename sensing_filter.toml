@@ -12,18 +12,19 @@ mail_private = "martin.vejling@gmail.com"
 Python = """RIS-Aided Sensing v.1.0 - 14.12.2022:
 - Initial configuration file (v1.0 - 16.12.2022)
 - Specialized configuration files: allow for more adaptability in experiments (v.2.0 - 07.06.2023)
-- Update to configuration file adapting to the MCMC algorithm v1.1 (v.2.1 - 04.08.2023)
-- Update to configuration file adapting to the MCMC algorithm v1.2 (v.2.2 - 24.08.2023)"""
+- Update configuration file adapting to the MCMC algorithm v1.1 (v.2.1 - 04.08.2023)
+- Update configuration file adapting to the MCMC algorithm v1.2 (v.2.2 - 24.08.2023)
+- Update configuration file adapting to the MCMC algorithm v1.4 (v.2.3 - 07.09.2023)"""
 
 ["channel_settings"]
 f_c = 3e10                      # float - Carrier frequency in Hz
-p_tx_hz_dbm = -70               # float - Transmit power in dBm per Hz
+p_tx_hz_dbm = -50               # float - Transmit power in dBm per Hz
 p_noise_hz_dbm = -140           # float - Noise power in dBm
-N_U = [24, 24]                  # list - UE antennas
+N_U = [32, 32]                  # list - UE antennas
 N_R = [5, 5]                  # list - RIS elements
 p_R = [25.0, 35.0, 5.0]         # list (floats) - RIS position
 n_R = [0, -1, 0]                # list (ints) - RIS normal vector
-delta_f = 125e03                # float - Subcarrier spacing in Hz
+delta_f = 175e03                # float - Subcarrier spacing in Hz
 N = 1000                        # int - Number of subcarriers
 c = 299792458                   # float - Speed of light in m/s
 T = 40                          # int - Number of time samples (40)
@@ -36,18 +37,18 @@ window = [0.0, 50.0, 0.0, 20.0, 0.0, 10.0]
 grid_dim = [20, 8, 4]           # list (ints) - The grid dimensions used for function interpolation
 speed = 25.0                    # float - Speed of UEs (m/s)
 epoch_time = 2e-01              # float - Epoch sample time (s)
-E = 10                           # int - The number of time epochs
+E = 1                           # int - The number of time epochs
 K = 2                           # int - The number of UEs
-lambda_Poi = 10                  # float - The average number of cluster centers
-lambda_c_Poi = 5                # float - The average number of clutter points per data collection protocol
-R = 5                         # float - Matern Type 2 process interaction distance for object process
+lambda_Poi = 20                  # float - The average number of cluster centers
+lambda_c_Poi = 35                # float - The average number of clutter points per data collection protocol
+R = 6                         # float - Matern Type 2 process interaction distance for object process
 p_FA = 1e-03                    # float - False alarm probability
 
 ["boolean_specifications"]
 object_extent = true            # bool - If true, consider an extended target model
 use_directional_RIS = false     # bool - If true, use directional RIS phase profiles
 use_saved_centers = false       # bool - If true, use pre-saved driving process
-use_mp = true                  # bool - If true, use multiprocessing on Monte Carlo simulation loop
+use_mp = false                  # bool - If true, use multiprocessing on Monte Carlo simulation loop
 load = false                    # bool - If ture, load the previously computed results
 save_results = true            # bool - If true, save the computed results
 fixed_number_of_targets = false  # bool - If true, use a fixed number of targets
@@ -56,12 +57,12 @@ verbose = false                 # bool - If true, show intermediate results
 
 ["experiment_settings"]
 sensing_alg = ["MCMC", "DBSCAN", "oracle"]   # list - The sensing algorithms to use
-sims = 100                        # int - The number of Monte Carlo simulations
+sims = 1                        # int - The number of Monte Carlo simulations
 signal_types_list = ["nonRIS"]  # list (strs) - The types of data collection protocols to use
 data_types_list = ["time_division"]  # list (strs) - The types of cooperative protocols to use
-N_mp_workers = 3                # int - The number of cores to use for multiprocessing
-seed = 13                       # int - The random seed
-savename = "L10_R5_C5_6d_uniform_003"    # str - Name of save file
+N_mp_workers = 14                # int - The number of cores to use for multiprocessing
+seed = 10                       # int - The random seed
+savename = "L20_R6_C35_6d_uniform_002"    # str - Name of save file
 
 ["oracle_hparams"]
 true_marks = true          # bool - If true, use covariance marks at the true location of the cluster center
@@ -69,15 +70,15 @@ true_extent = true         # bool - If true, use the true extent for the cluster
 true_loc = true            # bool - If true, use true position for extent estimation
 
 ["DBSCAN_hparams"]
-eps = [1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0]           # float - The maximum distance between two samples to be neighbors
-min_samples = [1, 2, 3, 4, 5]        # int - The minimum number of samples for creation of a cluster
+eps = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0]           # float - The maximum distance between two samples to be neighbors
+min_samples = [1, 2, 3, 4, 5, 6, 7]        # int - The minimum number of samples for creation of a cluster
 
 ["MCMC_hparams"]
-MCMC_runs = 5000                # int - The number of Markov chain Monte Carlo iterations
-burn_in = 4500                  # int - The number of iterations in the burn-in
+MCMC_runs = 10000                # int - The number of Markov chain Monte Carlo iterations
+burn_in = 9000                  # int - The number of iterations in the burn-in
 grid_dim = [25, 10, 5]          # list (ints) - The grid dimensions used for birth density discretization
 partition_extent = 20           # int - The number of samples in the birth discretization of the extent model
-hard_core_radius = 5          # float - The prior assumed hard core radius
+hard_core_radius = 6          # float - The prior assumed hard core radius
 p_m = 0.0                       # float - The probability of a move step
 p_em = 0.7                      # float - The probability of an extent move step
 move_prob_inc_interval = 20     # int - Iterations between incrementing the move probability
@@ -94,7 +95,7 @@ intensity_std = 5e-04           # float - The cluster center move standard devia
 extent_move_std = 1e-02         # float - The object extent move standard deviation
 method = "modified"             # str - If 'modified', use ad hoc updates of clutter and cluster intensities
                                 #     - If 'pure', use Metropolis-Hastings to update clutter and cluster intensities
-acceptance_type = "Stochastic Marginal Maximum A Posteriori"  # str - The algorithm for computing acceptance probabilities
+acceptance_type = "Metropolis-Hastings"  # str - The algorithm for computing acceptance probabilities
 extent_prior = "6d_uniform" # str - The prior extent model
 sigma_extent_min = 1.0          # float - The minimum extent radius for the '1d_uniform' extent model
 sigma_extent_max = 1.5            # float - The maximum extent radius for the '1d_uniform' extent model
@@ -106,5 +107,5 @@ birth_density_v1 = false        # bool - If true, use the first birth density ve
 birth_shift = [0.2, 0.2, 0.2]   # list - The uniform shift when proposing a birth
 birth_clutter_thin_var = 50       # int - Possible birth points are thinned to have expected number of 50 
 data_association_sim = "clutter"  # bool - If False, the data association is chosen to maximize the conditional density
-patience = 200                  # int - The early stopping patience
+patience = 500                  # int - The early stopping patience
 DBSCAN_init = false              # If true, initialize the Markov chain from DBSCAN, else from birthing a point

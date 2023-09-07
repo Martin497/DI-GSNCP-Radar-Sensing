@@ -13,10 +13,7 @@ Track changes:
 """
 
 
-import sys
 import os
-if os.path.abspath("..")+"/Modules" not in sys.path:
-    sys.path.append(os.path.abspath("..")+"/Modules")
 
 import numpy as np
 import matplotlib.pyplot as plt
