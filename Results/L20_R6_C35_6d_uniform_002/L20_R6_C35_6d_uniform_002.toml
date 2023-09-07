@@ -1,0 +1,101 @@
+title = "Configuration file v2.1 for: RIS-Aided Radar Sensing"
+
+[owner]
+name = "Martin Voigt Vejling"
+mail_es = "mvv@es.aau.dk"
+mail_math = "mvv@math.aau.dk"
+mail_private = "martin.vejling@gmail.com"
+
+["track changes"]
+Python = "RIS-Aided Sensing v.1.0 - 14.12.2022:\n- Initial configuration file (v1.0 - 16.12.2022)\n- Specialized configuration files: allow for more adaptability in experiments (v.2.0 - 07.06.2023)\n- Update configuration file adapting to the MCMC algorithm v1.1 (v.2.1 - 04.08.2023)\n- Update configuration file adapting to the MCMC algorithm v1.2 (v.2.2 - 24.08.2023)\n- Update configuration file adapting to the MCMC algorithm v1.4 (v.2.3 - 07.09.2023)"
+
+[channel_settings]
+f_c = 30000000000.0
+p_tx_hz_dbm = -50
+p_noise_hz_dbm = -140
+N_U = [ 32, 32,]
+N_R = [ 5, 5,]
+p_R = [ 25.0, 35.0, 5.0,]
+n_R = [ 0, -1, 0,]
+delta_f = 175000.0
+N = 1000
+c = 299792458
+T = 40
+T1 = 5
+
+[scenario_settings]
+window = [ 0.0, 50.0, 0.0, 20.0, 0.0, 10.0,]
+grid_dim = [ 20, 8, 4,]
+speed = 25.0
+epoch_time = 0.2
+E = 1
+K = 2
+lambda_Poi = 20
+lambda_c_Poi = 35
+R = 6
+p_FA = 0.001
+
+[boolean_specifications]
+object_extent = true
+use_directional_RIS = false
+use_saved_centers = false
+use_mp = false
+load = false
+save_results = true
+fixed_number_of_targets = false
+real_resolution = true
+verbose = false
+
+[experiment_settings]
+sensing_alg = [ "MCMC", "DBSCAN", "oracle",]
+sims = 1
+signal_types_list = [ "nonRIS",]
+data_types_list = [ "time_division",]
+N_mp_workers = 14
+seed = 10
+savename = "L20_R6_C35_6d_uniform_002"
+
+[oracle_hparams]
+true_marks = true
+true_extent = true
+true_loc = true
+
+[DBSCAN_hparams]
+eps = [ 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0,]
+min_samples = [ 1, 2, 3, 4, 5, 6, 7,]
+
+[MCMC_hparams]
+MCMC_runs = 10000
+burn_in = 9000
+grid_dim = [ 25, 10, 5,]
+partition_extent = 20
+hard_core_radius = 6
+p_m = 0.0
+p_em = 0.7
+move_prob_inc_interval = 20
+move_prob_inc = 0.1
+move_prob_max = 0.8
+vartheta = 0.1
+move_trace_interval = 40
+move_trace_min = 0.6
+move_trace_max = 0.9
+move_trace_decrease = 0.75
+move_trace_increase = 1.15
+clutter_std = 0.0005
+intensity_std = 0.0005
+extent_move_std = 0.01
+method = "modified"
+acceptance_type = "Metropolis-Hastings"
+extent_prior = "6d_uniform"
+sigma_extent_min = 1.0
+sigma_extent_max = 1.5
+extent_IW_df = 15
+extent_IW_scale = [ [ "20.9", "0.0", "0.0",], [ "0.0", "20.9", "0.0",], [ "0.0", "0.0", "20.9",],]
+cor_extent_min = -0.5
+cor_extent_max = 0.5
+birth_density_v1 = false
+birth_shift = [ 0.2, 0.2, 0.2,]
+birth_clutter_thin_var = 50
+data_association_sim = "clutter"
+patience = 500
+DBSCAN_init = false
