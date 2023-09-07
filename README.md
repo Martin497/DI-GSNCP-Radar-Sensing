@@ -1,5 +1,5 @@
 # DI-GSNCP-Radar-Sensing
-This GitHub repository contains the scripts for the IEEE ICASSP 2024 paper submission: "Multi-Sensor Multi-Scan Multiple Extended Object Radar Sensing".
+This GitHub repository contains the scripts for the IEEE ICASSP 2024 paper submission: "Multi-Sensor Multi-Scan Multiple Extended Object Radar Sensing"; Martin V. Vejling, Christophe A. N. Biscio, and Petar Popovski, 2023.
 
 Author:	Martin Voigt Vejling
 
