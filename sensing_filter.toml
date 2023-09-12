@@ -18,13 +18,13 @@ Python = """RIS-Aided Sensing v.1.0 - 14.12.2022:
 
 ["channel_settings"]
 f_c = 3e10                      # float - Carrier frequency in Hz
-p_tx_hz_dbm = -50               # float - Transmit power in dBm per Hz
+p_tx_hz_dbm = -70               # float - Transmit power in dBm per Hz
 p_noise_hz_dbm = -140           # float - Noise power in dBm
-N_U = [32, 32]                  # list - UE antennas
+N_U = [24, 24]                  # list - UE antennas
 N_R = [5, 5]                  # list - RIS elements
 p_R = [25.0, 35.0, 5.0]         # list (floats) - RIS position
 n_R = [0, -1, 0]                # list (ints) - RIS normal vector
-delta_f = 175e03                # float - Subcarrier spacing in Hz
+delta_f = 125e03                # float - Subcarrier spacing in Hz
 N = 1000                        # int - Number of subcarriers
 c = 299792458                   # float - Speed of light in m/s
 T = 40                          # int - Number of time samples (40)
@@ -62,7 +62,7 @@ signal_types_list = ["nonRIS"]  # list (strs) - The types of data collection pro
 data_types_list = ["time_division"]  # list (strs) - The types of cooperative protocols to use
 N_mp_workers = 14                # int - The number of cores to use for multiprocessing
 seed = 10                       # int - The random seed
-savename = "L20_R6_C35_6d_uniform_002"    # str - Name of save file
+savename = "test"    # str - Name of save file
 
 ["oracle_hparams"]
 true_marks = true          # bool - If true, use covariance marks at the true location of the cluster center
@@ -74,11 +74,11 @@ eps = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0]           # float - The m
 min_samples = [1, 2, 3, 4, 5, 6, 7]        # int - The minimum number of samples for creation of a cluster
 
 ["MCMC_hparams"]
-MCMC_runs = 10000                # int - The number of Markov chain Monte Carlo iterations
-burn_in = 9000                  # int - The number of iterations in the burn-in
+MCMC_runs = 5000                # int - The number of Markov chain Monte Carlo iterations
+burn_in = 4900                  # int - The number of iterations in the burn-in
 grid_dim = [25, 10, 5]          # list (ints) - The grid dimensions used for birth density discretization
 partition_extent = 20           # int - The number of samples in the birth discretization of the extent model
-hard_core_radius = 6          # float - The prior assumed hard core radius
+hard_core_radius = 8          # float - The prior assumed hard core radius
 p_m = 0.0                       # float - The probability of a move step
 p_em = 0.7                      # float - The probability of an extent move step
 move_prob_inc_interval = 20     # int - Iterations between incrementing the move probability
@@ -107,5 +107,5 @@ birth_density_v1 = false        # bool - If true, use the first birth density ve
 birth_shift = [0.2, 0.2, 0.2]   # list - The uniform shift when proposing a birth
 birth_clutter_thin_var = 50       # int - Possible birth points are thinned to have expected number of 50 
 data_association_sim = "clutter"  # bool - If False, the data association is chosen to maximize the conditional density
-patience = 500                  # int - The early stopping patience
+patience = 200                  # int - The early stopping patience
 DBSCAN_init = false              # If true, initialize the Markov chain from DBSCAN, else from birthing a point
